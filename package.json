@@ -6,10 +6,18 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.43.1",
+    "elysia": "latest",
+    "eslint": "^9.26.0",
+    "pg": "^8.15.6",
+    "prettier": "^3.5.3"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "@types/pg": "^8.15.1",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4"
   },
   "module": "src/index.js"
 }
