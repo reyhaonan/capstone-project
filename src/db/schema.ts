@@ -13,12 +13,11 @@ import {
 
 export const users = pgTable('users', {
 	userId: uuid('user_id').primaryKey().defaultRandom(),
-	firstName: varchar('first_name'),
-	lastName: varchar('last_name'),
+	name: varchar('name').notNull(),
 	email: varchar('email').notNull(),
 	password: varchar('password').notNull(),
-	phoneNumber: varchar('phone_number'),
-	dateOfBirth: date('date_of_birth'),
+	phoneNumber: varchar('phone_number').notNull(),
+	dateOfBirth: date('date_of_birth').notNull(),
 	address: text('address'),
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
@@ -26,12 +25,11 @@ export const users = pgTable('users', {
 
 export const doctors = pgTable('doctors', {
 	doctorId: uuid('doctor_id').primaryKey().defaultRandom(),
-	firstName: varchar('first_name'),
-	lastName: varchar('last_name'),
-	specialization: varchar('specialization'),
-	licenseNumber: varchar('license_number'),
+	name: varchar('name').notNull(),
+	specialization: varchar('specialization').notNull(),
+	licenseNumber: varchar('license_number').notNull(),
 	email: varchar('email').notNull(),
-	phoneNumber: varchar('phone_number'),
+	phoneNumber: varchar('phone_number').notNull(),
 	hospitalAffiliation: varchar('hospital_affiliation'),
 	password: varchar('password').notNull(),
 	createdAt: timestamp('created_at').defaultNow(),
@@ -78,3 +76,13 @@ export const doctorReferrals = pgTable('doctor_referrals', {
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
 })
+
+export const table = {
+	users,
+	doctors,
+	usersDoctors,
+	chats,
+	doctorReferrals,
+} as const
+
+export type Table = typeof table
