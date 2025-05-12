@@ -10,7 +10,7 @@ import { getExpTimestamp } from '@/utils'
 import { createUserSchema } from '@/types/users.types'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 import { Role } from '@/types/enums/role.enum'
-import { authPlugin } from '@/plugins/authPlugin'
+import { userAuthPlugin } from '@/plugins/userAuthPlugin'
 
 const { users } = dbModel.insert
 
@@ -52,24 +52,19 @@ export const userRoutes = new Elysia({
 			refreshJWT,
 			body,
 			cookie: { accessToken, refreshToken },
-			set,
+			status,
 		}) => {
 			const user = await getUserByEmail(body.email)
 
-			if (!user) {
-				set.status = 'Unauthorized'
-				return { message: 'Invalid email or password' }
-			}
+			if (!user) return status('Unauthorized', 'Invalid email or password')
 
 			const passwordMatch = await Bun.password.verify(
 				body.password,
 				user.password,
 				'bcrypt'
 			)
-			if (!passwordMatch) {
-				set.status = 'Unauthorized'
-				return { message: 'Invalid email or password' }
-			}
+			if (!passwordMatch)
+				return status('Unauthorized', 'Invalid email or password')
 
 			const accessJWTToken = await accessJWT.sign({
 				sub: user.userId,
@@ -113,26 +108,19 @@ export const userRoutes = new Elysia({
 			cookie: { accessToken, refreshToken },
 			refreshJWT,
 			accessJWT,
-			error,
+			status,
 		}) => {
-			if (!refreshToken.value) {
-				return error('Unauthorized', 'Refresh token is missing')
-			}
+			if (!refreshToken.value)
+				return status('Unauthorized', 'Refresh token is missing')
 
 			const jwtPayload = await refreshJWT.verify(refreshToken.value)
-			if (!jwtPayload) {
-				return error('Unauthorized', 'Refresh token is invalid')
-			}
+			if (!jwtPayload) return status('Unauthorized', 'Refresh token is invalid')
 
 			const userId = jwtPayload.sub
-			if (!userId) {
-				return error('Unauthorized', 'User ID is missing')
-			}
+			if (!userId) return status('Unauthorized', 'User ID is missing')
 
 			const user = await getUserById(userId)
-			if (!user) {
-				return error('Unauthorized', 'User not found')
-			}
+			if (!user) return status('Unauthorized', 'User not found')
 
 			const accessJWTToken = await accessJWT.sign({
 				sub: user.userId,
@@ -152,7 +140,23 @@ export const userRoutes = new Elysia({
 			}
 		}
 	)
-	.use(authPlugin)
+	.use(userAuthPlugin)
+	.get('/me', ({ user }) => {
+		return {
+			message: 'User information retrieved successfully',
+			data: {
+				user: {
+					userId: user.userId,
+					name: user.name,
+					email: user.email,
+					phoneNumber: user.phoneNumber,
+					dateOfBirth: user.dateOfBirth,
+					address: user.address,
+					createdAt: user.createdAt,
+				},
+			},
+		}
+	})
 	.post('/logout', async ({ cookie: { accessToken, refreshToken } }) => {
 		accessToken.remove()
 		refreshToken.remove()

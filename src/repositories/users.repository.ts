@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import { table } from '@/db/schema'
-import { createUserSchema } from '@/types/users.typebox'
+import { createUserSchema } from '@/types/users.types'
 import { eq } from 'drizzle-orm'
 
 export const createUser = async (user: typeof createUserSchema.static) => {
