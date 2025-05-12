@@ -1,12 +1,13 @@
 import {
 	boolean,
 	date,
+	foreignKey,
 	pgEnum,
 	pgTable,
 	primaryKey,
-	serial,
 	text,
 	timestamp,
+	unique,
 	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core'
@@ -47,41 +48,65 @@ export const statusEnum = pgEnum('status', ['ONGOING', 'CLOSED'])
 export const usersDoctors = pgTable(
 	'users_doctors',
 	{
-		userId: uuid('user_id').notNull(),
-		doctorId: uuid('doctor_id').notNull(),
+		userId: uuid('user_id')
+			.notNull()
+			.references(() => users.userId),
+		doctorId: uuid('doctor_id')
+			.notNull()
+			.references(() => doctors.doctorId),
 		createdAt: timestamp('created_at').defaultNow(),
 		status: statusEnum('status').notNull().default('ONGOING'),
 	},
-	(table) => [primaryKey({ columns: [table.userId, table.doctorId] })]
+	(table) => [
+		primaryKey({ columns: [table.userId, table.doctorId] }),
+		unique('users_doctors_unique').on(table.userId, table.doctorId),
+	]
 )
-export const chats = pgTable('chats', {
-	chatId: serial('chat_id').primaryKey(),
-	userId: uuid('user_id')
-		.notNull()
-		.references(() => users.userId),
-	doctorId: uuid('doctor_id')
-		.notNull()
-		.references(() => doctors.doctorId),
-	messageText: text('message_text'),
-	isFromDoctor: boolean('is_from_doctor'),
-	createdAt: timestamp('created_at').defaultNow(),
-	updatedAt: timestamp('updated_at').defaultNow(),
-})
 
-export const doctorReferrals = pgTable('doctor_referrals', {
-	referralId: uuid('referral_id').primaryKey().defaultRandom(),
-	userId: uuid('user_id')
-		.notNull()
-		.references(() => users.userId),
-	doctorId: uuid('doctor_id')
-		.notNull()
-		.references(() => doctors.doctorId),
-	referralReason: text('referral_reason'),
-	referralDate: timestamp('referral_date'),
-	notes: text('notes'),
-	createdAt: timestamp('created_at').defaultNow(),
-	updatedAt: timestamp('updated_at').defaultNow(),
-})
+export const chats = pgTable(
+	'chats',
+	{
+		chatId: uuid('chat_id').notNull().defaultRandom().primaryKey(),
+		userId: uuid('user_id').notNull(),
+		doctorId: uuid('doctor_id').notNull(),
+		messageText: text('message_text'),
+		isFromDoctor: boolean('is_from_doctor'),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.userId, table.doctorId],
+			foreignColumns: [usersDoctors.userId, usersDoctors.doctorId],
+		}),
+		unique('chats_unique').on(table.chatId, table.doctorId, table.userId),
+	]
+)
+
+export const doctorReferrals = pgTable(
+	'doctor_referrals',
+	{
+		referralId: uuid('referral_id').defaultRandom().primaryKey(),
+		userId: uuid('user_id').notNull(),
+		doctorId: uuid('doctor_id').notNull(),
+		referralReason: text('referral_reason'),
+		referralDate: timestamp('referral_date'),
+		notes: text('notes'),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.userId, table.doctorId],
+			foreignColumns: [usersDoctors.userId, usersDoctors.doctorId],
+		}),
+		unique('doctor_referrals_unique').on(
+			table.referralId,
+			table.doctorId,
+			table.userId
+		),
+	]
+)
 
 export const table = {
 	users,

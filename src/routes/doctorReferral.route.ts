@@ -1,6 +1,7 @@
 import { Elysia, t } from 'elysia'
 import { agnosticAuthPlugin } from '@/plugins/agnosticAuthPlugin'
 import { getDoctorReferralByIdAndUserDoctorId } from '@/repositories/doctorReferrals.repository'
+import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
 
 export const referralRoutes = new Elysia({
 	prefix: '/referral',
@@ -39,4 +40,10 @@ export const referralRoutes = new Elysia({
 				},
 			}
 		)
+	)
+
+	.group('', (app) =>
+		app.use(doctorAuthPlugin).post('/create', async () => {
+			return { message: 'Referral created successfully' }
+		})
 	)
