@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
-import { userRoutes } from './routes/user.route'
-import { doctorRoutes } from './routes/doctor.route'
+import { userRoutes } from './routes/users.route'
+import { doctorRoutes } from './routes/doctors.route'
 import cors from '@elysiajs/cors'
 import swagger from '@elysiajs/swagger'
 
