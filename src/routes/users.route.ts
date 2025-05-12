@@ -25,10 +25,7 @@ export const userRoutes = new Elysia({
 	.post(
 		'/register',
 		async ({ body }) => {
-			const password = await Bun.password.hash(body.password, {
-				algorithm: 'bcrypt',
-				cost: 10,
-			})
+			const password = await Bun.password.hash(body.password)
 
 			await createUser({
 				email: body.email,
@@ -62,8 +59,7 @@ export const userRoutes = new Elysia({
 
 			const passwordMatch = await Bun.password.verify(
 				body.password,
-				user.password,
-				'bcrypt'
+				user.password
 			)
 			if (!passwordMatch)
 				return status('Unauthorized', 'Invalid email or password')

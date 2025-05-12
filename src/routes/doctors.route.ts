@@ -23,10 +23,7 @@ export const doctorRoutes = new Elysia({
 	.post(
 		'/register',
 		async ({ body }) => {
-			const password = await Bun.password.hash(body.password, {
-				algorithm: 'bcrypt',
-				cost: 10,
-			})
+			const password = await Bun.password.hash(body.password)
 
 			await createDoctor({
 				name: body.name,
@@ -61,8 +58,7 @@ export const doctorRoutes = new Elysia({
 
 			const passwordMatch = await Bun.password.verify(
 				body.password,
-				doctor.password,
-				'bcrypt'
+				doctor.password
 			)
 			if (!passwordMatch)
 				return status('Unauthorized', 'Invalid email or password')
@@ -208,4 +204,6 @@ export const doctorRoutes = new Elysia({
 						message: 'Logout successful',
 					}
 				})
+
+		// .ws('/chat')
 	)
