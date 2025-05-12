@@ -1,8 +1,7 @@
 import { db } from '@/db'
 import { table } from '@/db/schema'
-import { createDoctorSchema } from '@/types/doctors.types'
+import { createDoctorSchema, searchDoctorsSchema } from '@/types/doctors.types'
 import { and, eq, ilike, SQL } from 'drizzle-orm'
-import { searchDoctorsSchema } from '@/types/users.types'
 
 export const createDoctor = async (
 	doctor: typeof createDoctorSchema.static
