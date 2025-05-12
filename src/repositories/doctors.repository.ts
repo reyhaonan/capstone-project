@@ -4,7 +4,7 @@ import {
 	createDoctorSchema,
 	searchDoctorsSchema,
 } from '@/types/schema/doctors.schema'
-import { and, eq, ilike, SQL } from 'drizzle-orm'
+import { and, count, eq, ilike, SQL } from 'drizzle-orm'
 
 export const createDoctor = async (
 	doctor: typeof createDoctorSchema.static
@@ -36,10 +36,25 @@ export const searchDoctors = async ({
 	if (specialization)
 		filters.push(eq(table.doctors.specialization, specialization))
 
-	return db
-		.select()
+	const [{ total }] = await db
+		.select({ total: count() })
+		.from(table.doctors)
+		.where(and(...filters))
+
+	const data = await db
+		.select({
+			doctorId: table.doctors.doctorId,
+			name: table.doctors.name,
+			specialization: table.doctors.specialization,
+			licenseNumber: table.doctors.licenseNumber,
+			email: table.doctors.email,
+			hospitalAffiliation: table.doctors.hospitalAffiliation,
+			createdAt: table.doctors.createdAt,
+		})
 		.from(table.doctors)
 		.where(and(...filters))
 		.limit(perPage)
 		.offset((page - 1) * perPage)
+
+	return { total, data }
 }

@@ -183,7 +183,12 @@ export const userRoutes = new Elysia({
 				.get(
 					'/searchDoctor',
 					async ({ query }) => {
-						const data = await searchDoctors(query)
+						const { data, total } = await searchDoctors(query)
+
+						return {
+							data,
+							total,
+						}
 					},
 					{
 						query: searchDoctorsSchema,
