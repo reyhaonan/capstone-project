@@ -17,7 +17,8 @@ import {
 	createUsersDoctorsCompositeKey,
 	getUsersDoctors,
 } from '@/repositories/usersDoctors.repository'
-import { createChat } from '@/repositories/chat.repository'
+import { createChat, getChatHistory } from '@/repositories/chat.repository'
+import { selectChatSchema } from '@/types/schema/chats.schema'
 
 const { users, usersDoctors } = dbModel.insert
 
@@ -243,6 +244,24 @@ export const userRoutes = new Elysia({
 						message: 'Logout successful',
 					}
 				})
+
+				.get(
+					'/chat/:doctorId/history',
+					async ({ params: { doctorId }, query, user }) => {
+						return getChatHistory({
+							userId: user.userId,
+							doctorId: doctorId,
+							...query,
+						})
+					},
+					{
+						params: t.Object({
+							doctorId: usersDoctors.doctorId,
+						}),
+						query: t.Omit(selectChatSchema, ['userId', 'doctorId']),
+					}
+				)
+
 				.ws('/chat/:doctorId', {
 					body: t.Object({
 						message: t.String(),
