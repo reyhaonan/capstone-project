@@ -90,6 +90,7 @@ export const doctorReferrals = pgTable(
 		userId: uuid('user_id').notNull(),
 		doctorId: uuid('doctor_id').notNull(),
 		referralReason: text('referral_reason').notNull(),
+		referralDate: date('referral_date').notNull(),
 		notes: text('notes').notNull(),
 		createdAt: timestamp('created_at').defaultNow(),
 		updatedAt: timestamp('updated_at').defaultNow(),

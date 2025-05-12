@@ -13,8 +13,9 @@ import { Role } from '@/types/enums/role.enum'
 import { userAuthPlugin } from '@/plugins/userAuthPlugin'
 import { searchDoctors } from '@/repositories/doctors.repository'
 import { searchDoctorsSchema } from '@/types/schema/doctors.schema'
+import { createUsersDoctorsCompositeKey } from '@/repositories/usersDoctors.repository'
 
-const { users } = dbModel.insert
+const { users, usersDoctors } = dbModel.insert
 
 export const userRoutes = new Elysia({
 	prefix: '/user',
@@ -181,7 +182,7 @@ export const userRoutes = new Elysia({
 				.use(userAuthPlugin)
 
 				.get(
-					'/searchDoctor',
+					'/search-doctors',
 					async ({ query }) => {
 						const { data, total } = await searchDoctors(query)
 
@@ -192,6 +193,21 @@ export const userRoutes = new Elysia({
 					},
 					{
 						query: searchDoctorsSchema,
+					}
+				)
+
+				.post(
+					'/initiate-consultation',
+					({ body: { doctorId }, user }) => {
+						const result = createUsersDoctorsCompositeKey({
+							doctorId,
+							userId: user.userId,
+						})
+					},
+					{
+						body: t.Object({
+							doctorId: usersDoctors.doctorId,
+						}),
 					}
 				)
 

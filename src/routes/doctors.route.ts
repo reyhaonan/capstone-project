@@ -11,8 +11,9 @@ import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { Role } from '@/types/enums/role.enum'
 import { dbModel } from '@/db/model'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
+import { updateUsersDoctorsStatus } from '@/repositories/usersDoctors.repository'
 
-const { doctors } = dbModel.insert
+const { doctors, usersDoctors } = dbModel.insert
 
 export const doctorRoutes = new Elysia({
 	prefix: '/doctor',
@@ -178,6 +179,27 @@ export const doctorRoutes = new Elysia({
 		(app) =>
 			app
 				.use(doctorAuthPlugin)
+
+				.post(
+					'/conclude-consultation',
+					({ body: { userId }, doctor }) => {
+						const result = updateUsersDoctorsStatus({
+							doctorId: doctor.doctorId,
+							userId,
+							status: 'CLOSED',
+						})
+
+						return {
+							message: 'Consultation concluded successfully',
+							data: result,
+						}
+					},
+					{
+						body: t.Object({
+							userId: usersDoctors.userId,
+						}),
+					}
+				)
 
 				.get('/me', ({ doctor }) => {
 					return {

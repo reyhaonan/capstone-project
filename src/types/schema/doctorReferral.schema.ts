@@ -7,5 +7,6 @@ export const createDoctorSchema = t.Object({
 	userId: doctorReferrals.userId,
 	doctorId: doctorReferrals.doctorId,
 	referralReason: doctorReferrals.referralReason,
+	referralDate: doctorReferrals.referralDate,
 	notes: doctorReferrals.notes,
 })
