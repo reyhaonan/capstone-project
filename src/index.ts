@@ -8,7 +8,11 @@ import swagger from '@elysiajs/swagger'
 
 const app = new Elysia()
 	.use(cors())
-	.use(swagger())
+	.use(
+		swagger({
+			path: '/docs',
+		})
+	)
 	.use(websocketRoutes)
 	.use(chatRoutes)
 	.use(userRoutes)
