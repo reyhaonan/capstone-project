@@ -17,6 +17,7 @@ import {
 	createUsersDoctorsCompositeKey,
 	getUsersDoctors,
 } from '@/repositories/usersDoctors.repository'
+import { createChat } from '@/repositories/chat.repository'
 
 const { users, usersDoctors } = dbModel.insert
 
@@ -249,8 +250,15 @@ export const userRoutes = new Elysia({
 					params: t.Object({
 						doctorId: usersDoctors.doctorId,
 					}),
-					message(ws, { message }) {
+					async message(ws, { message }) {
 						const { user, params } = ws.data
+
+						const result = await createChat({
+							userId: user.userId,
+							doctorId: params.doctorId,
+							message: message,
+							isFromDoctor: false,
+						})
 
 						const topic = getWebsocketTopic({
 							userId: user.userId,
@@ -258,7 +266,7 @@ export const userRoutes = new Elysia({
 						})
 
 						// ws.publish('chat', message)
-						ws.publish(topic, message)
+						ws.publish(topic, result)
 					},
 					close(ws) {},
 					async open(ws) {

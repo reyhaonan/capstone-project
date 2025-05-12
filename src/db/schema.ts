@@ -69,7 +69,7 @@ export const chats = pgTable(
 		chatId: uuid('chat_id').notNull().defaultRandom().primaryKey(),
 		userId: uuid('user_id').notNull(),
 		doctorId: uuid('doctor_id').notNull(),
-		messageText: text('message_text').notNull(),
+		message: text('message').notNull(),
 		isFromDoctor: boolean('is_from_doctor').notNull(),
 		createdAt: timestamp('created_at').defaultNow(),
 		updatedAt: timestamp('updated_at').defaultNow(),
