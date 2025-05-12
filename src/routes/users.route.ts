@@ -6,14 +6,17 @@ import {
 	getUserById,
 } from '@/repositories/users.repository'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
-import { getExpTimestamp } from '@/utils'
+import { getExpTimestamp, getWebsocketTopic } from '@/utils'
 import { createUserSchema } from '@/types/schema/users.schema'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 import { Role } from '@/types/enums/role.enum'
 import { userAuthPlugin } from '@/plugins/userAuthPlugin'
 import { searchDoctors } from '@/repositories/doctors.repository'
 import { searchDoctorsSchema } from '@/types/schema/doctors.schema'
-import { createUsersDoctorsCompositeKey } from '@/repositories/usersDoctors.repository'
+import {
+	createUsersDoctorsCompositeKey,
+	getUsersDoctors,
+} from '@/repositories/usersDoctors.repository'
 
 const { users, usersDoctors } = dbModel.insert
 
@@ -73,6 +76,7 @@ export const userRoutes = new Elysia({
 			})
 			accessToken.set({
 				value: accessJWTToken,
+				httpOnly: true,
 				maxAge: ACCESS_TOKEN_EXP,
 			})
 
@@ -83,6 +87,7 @@ export const userRoutes = new Elysia({
 
 			refreshToken.set({
 				value: refreshJWTToken,
+				httpOnly: true,
 				maxAge: REFRESH_TOKEN_EXP,
 			})
 
@@ -129,6 +134,7 @@ export const userRoutes = new Elysia({
 			})
 			accessToken.set({
 				value: accessJWTToken,
+				httpOnly: true,
 				maxAge: ACCESS_TOKEN_EXP,
 			})
 
@@ -236,16 +242,45 @@ export const userRoutes = new Elysia({
 						message: 'Logout successful',
 					}
 				})
-				.ws('/ws', {
+				.ws('/chat/:doctorId', {
 					body: t.Object({
 						message: t.String(),
 					}),
+					params: t.Object({
+						doctorId: usersDoctors.doctorId,
+					}),
 					message(ws, { message }) {
-						ws.send(message)
+						const { user, params } = ws.data
+
+						const topic = getWebsocketTopic({
+							userId: user.userId,
+							doctorId: params.doctorId,
+						})
+
+						// ws.publish('chat', message)
+						ws.publish(topic, message)
 					},
 					close(ws) {},
-					open(ws) {
-						ws.send('Hello from Elysia!')
+					async open(ws) {
+						const { user, params } = ws.data
+
+						const result = await getUsersDoctors({
+							userId: user.userId,
+							doctorId: params.doctorId,
+							status: 'ONGOING',
+						})
+
+						if (!result) return ws.close()
+
+						const topic = getWebsocketTopic({
+							userId: user.userId,
+							doctorId: params.doctorId,
+						})
+
+						// ws.subscribe('chat')
+						ws.subscribe(topic)
 					},
 				})
 	)
+
+const openWSConnection = new Map()

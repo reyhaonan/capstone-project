@@ -1,6 +1,9 @@
 import { db } from '@/db'
 import { table } from '@/db/schema'
-import { createUsersDoctorsSchema } from '@/types/schema/usersDoctors.schema'
+import {
+	createUsersDoctorsSchema,
+	selectUsersDoctorsSchema,
+} from '@/types/schema/usersDoctors.schema'
 import { and, eq } from 'drizzle-orm'
 
 export const createUsersDoctorsCompositeKey = async ({
@@ -34,4 +37,16 @@ export const updateUsersDoctorsStatus = async (
 			)
 		)
 		.returning()
+}
+
+export const getUsersDoctors = async (
+	body: typeof selectUsersDoctorsSchema.static
+) => {
+	return db.query.usersDoctors.findFirst({
+		where: and(
+			eq(table.usersDoctors.userId, body.userId),
+			eq(table.usersDoctors.doctorId, body.doctorId),
+			eq(table.usersDoctors.status, body.status)
+		),
+	})
 }

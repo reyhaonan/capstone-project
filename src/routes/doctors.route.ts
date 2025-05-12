@@ -6,12 +6,15 @@ import {
 	getDoctorById,
 } from '@/repositories/doctors.repository'
 import { createDoctorSchema } from '@/types/schema/doctors.schema'
-import { getExpTimestamp } from '@/utils'
+import { getExpTimestamp, getWebsocketTopic } from '@/utils'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { Role } from '@/types/enums/role.enum'
 import { dbModel } from '@/db/model'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
-import { updateUsersDoctorsStatus } from '@/repositories/usersDoctors.repository'
+import {
+	getUsersDoctors,
+	updateUsersDoctorsStatus,
+} from '@/repositories/usersDoctors.repository'
 
 const { doctors, usersDoctors } = dbModel.insert
 
@@ -67,10 +70,11 @@ export const doctorRoutes = new Elysia({
 			const accessJWTToken = await accessJWT.sign({
 				sub: doctor.doctorId,
 				exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-				role: Role.USER,
+				role: Role.DOCTOR,
 			})
 			accessToken.set({
 				value: accessJWTToken,
+				httpOnly: true,
 				maxAge: ACCESS_TOKEN_EXP,
 			})
 
@@ -81,6 +85,7 @@ export const doctorRoutes = new Elysia({
 
 			refreshToken.set({
 				value: refreshJWTToken,
+				httpOnly: true,
 				maxAge: REFRESH_TOKEN_EXP,
 			})
 
@@ -123,10 +128,11 @@ export const doctorRoutes = new Elysia({
 			const accessJWTToken = await accessJWT.sign({
 				sub: doctor.doctorId,
 				exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-				role: Role.USER,
+				role: Role.DOCTOR,
 			})
 			accessToken.set({
 				value: accessJWTToken,
+				httpOnly: true,
 				maxAge: ACCESS_TOKEN_EXP,
 			})
 
@@ -206,6 +212,7 @@ export const doctorRoutes = new Elysia({
 						message: 'Doctor information retrieved successfully',
 						data: {
 							user: {
+								doctorId: doctor.doctorId,
 								name: doctor.name,
 								email: doctor.email,
 								password: doctor.password,
@@ -226,6 +233,43 @@ export const doctorRoutes = new Elysia({
 						message: 'Logout successful',
 					}
 				})
+				.ws('/chat/:userId', {
+					body: t.Object({
+						message: t.String(),
+					}),
+					params: t.Object({
+						userId: usersDoctors.userId,
+					}),
+					message(ws, { message }) {
+						const { doctor, params } = ws.data
 
-		// .ws('/chat')
+						const topic = getWebsocketTopic({
+							userId: params.userId,
+							doctorId: doctor.doctorId,
+						})
+
+						// ws.publish('chat', message)
+						ws.publish(topic, message)
+					},
+					close(ws) {},
+					async open(ws) {
+						const { doctor, params } = ws.data
+
+						const result = await getUsersDoctors({
+							userId: params.userId,
+							doctorId: doctor.doctorId,
+							status: 'ONGOING',
+						})
+
+						if (!result) return ws.close()
+
+						const topic = getWebsocketTopic({
+							userId: params.userId,
+							doctorId: doctor.doctorId,
+						})
+
+						// ws.subscribe('chat')
+						ws.subscribe(topic)
+					},
+				})
 	)
