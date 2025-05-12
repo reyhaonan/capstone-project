@@ -5,7 +5,7 @@ import {
 	getDoctorByEmail,
 	getDoctorById,
 } from '@/repositories/doctors.repository'
-import { createDoctorSchema } from '@/types/doctors.schema'
+import { createDoctorSchema } from '@/types/schema/doctors.schema'
 import { getExpTimestamp } from '@/utils'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { Role } from '@/types/enums/role.enum'

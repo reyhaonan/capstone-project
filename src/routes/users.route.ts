@@ -7,12 +7,12 @@ import {
 } from '@/repositories/users.repository'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { getExpTimestamp } from '@/utils'
-import { createUserSchema } from '@/types/users.schema'
+import { createUserSchema } from '@/types/schema/users.schema'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 import { Role } from '@/types/enums/role.enum'
 import { userAuthPlugin } from '@/plugins/userAuthPlugin'
 import { searchDoctors } from '@/repositories/doctors.repository'
-import { searchDoctorsSchema } from '@/types/doctors.schema'
+import { searchDoctorsSchema } from '@/types/schema/doctors.schema'
 
 const { users } = dbModel.insert
 

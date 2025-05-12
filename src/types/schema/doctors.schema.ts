@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 import { dbModel } from '@/db/model'
-import { paginationSchema } from '@/types/pagination.schema'
+import { paginationSchema } from '@/types/schema/pagination.schema'
 
 const { doctors: doctorsSchema } = dbModel.insert
 
