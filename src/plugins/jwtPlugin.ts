@@ -10,6 +10,7 @@ export const jwtPlugin = new Elysia()
 			name: 'accessJWT',
 			secret: process.env.JWT_SECRET,
 			schema: t.Object({
+				sub: t.String(),
 				role: t.Enum(Role),
 			}),
 			exp: getExpTimestamp(ACCESS_TOKEN_EXP),

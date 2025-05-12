@@ -10,6 +10,7 @@ import { getExpTimestamp } from '@/utils'
 import { createUserSchema } from '@/types/users.types'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 import { Role } from '@/types/enums/role.enum'
+import { authPlugin } from '@/plugins/authPlugin'
 
 const { users } = dbModel.insert
 
@@ -112,29 +113,25 @@ export const userRoutes = new Elysia({
 			cookie: { accessToken, refreshToken },
 			refreshJWT,
 			accessJWT,
-			set,
+			error,
 		}) => {
 			if (!refreshToken.value) {
-				set.status = 'Unauthorized'
-				return { message: 'Refresh token is missing' }
+				return error('Unauthorized', 'Refresh token is missing')
 			}
 
 			const jwtPayload = await refreshJWT.verify(refreshToken.value)
 			if (!jwtPayload) {
-				set.status = 'Unauthorized'
-				return { message: 'Refresh token is invalid' }
+				return error('Unauthorized', 'Refresh token is invalid')
 			}
 
 			const userId = jwtPayload.sub
 			if (!userId) {
-				set.status = 'Unauthorized'
-				return { message: 'User ID is missing' }
+				return error('Unauthorized', 'User ID is missing')
 			}
 
 			const user = await getUserById(userId)
 			if (!user) {
-				set.status = 'Unauthorized'
-				return { message: 'User not found' }
+				return error('Unauthorized', 'User not found')
 			}
 
 			const accessJWTToken = await accessJWT.sign({
@@ -155,6 +152,7 @@ export const userRoutes = new Elysia({
 			}
 		}
 	)
+	.use(authPlugin)
 	.post('/logout', async ({ cookie: { accessToken, refreshToken } }) => {
 		accessToken.remove()
 		refreshToken.remove()
