@@ -23,6 +23,7 @@ export const userRoutes = new Elysia({
 	detail: { tags: ['User'] },
 })
 	.use(jwtPlugin)
+
 	.post(
 		'/register',
 		async ({ body }) => {
@@ -234,5 +235,17 @@ export const userRoutes = new Elysia({
 					return {
 						message: 'Logout successful',
 					}
+				})
+				.ws('/ws', {
+					body: t.Object({
+						message: t.String(),
+					}),
+					message(ws, { message }) {
+						ws.send(message)
+					},
+					close(ws) {},
+					open(ws) {
+						ws.send('Hello from Elysia!')
+					},
 				})
 	)

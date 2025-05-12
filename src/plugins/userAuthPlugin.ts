@@ -7,11 +7,18 @@ const userAuthPlugin = new Elysia()
 	.use(jwtPlugin)
 	.derive(
 		{ as: 'scoped' },
-		async ({ accessJWT, cookie: { accessToken }, status }) => {
-			if (!accessToken.value)
+		async ({
+			accessJWT,
+			cookie: { accessToken },
+			headers: { authorization },
+			status,
+		}) => {
+			if (!accessToken.value && !authorization)
 				return status('Unauthorized', 'Access token is missing')
 
-			const jwtPayload = await accessJWT.verify(accessToken.value)
+			const token = accessToken.value || authorization!.replace('Bearer ', '')
+
+			const jwtPayload = await accessJWT.verify(token)
 			if (!jwtPayload) return status('Forbidden', 'Access token is invalid')
 
 			if (jwtPayload.role !== Role.USER)
