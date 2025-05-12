@@ -1,7 +1,11 @@
 import { Elysia, t } from 'elysia'
 import { agnosticAuthPlugin } from '@/plugins/agnosticAuthPlugin'
-import { getDoctorReferralByIdAndUserDoctorId } from '@/repositories/doctorReferrals.repository'
+import {
+	createDoctorReferral,
+	getDoctorReferralByIdAndUserDoctorId,
+} from '@/repositories/doctorReferrals.repository'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
+import { createDoctorSchema } from '@/types/schema/doctorReferral.schema'
 
 export const referralRoutes = new Elysia({
 	prefix: '/referral',
@@ -43,7 +47,23 @@ export const referralRoutes = new Elysia({
 	)
 
 	.group('', (app) =>
-		app.use(doctorAuthPlugin).post('/create', async () => {
-			return { message: 'Referral created successfully' }
-		})
+		app.use(doctorAuthPlugin).post(
+			'/create',
+			async ({ body, doctor, status }) => {
+				const result = await createDoctorReferral({
+					...body,
+					doctorId: doctor.doctorId,
+				})
+
+				if (!result) status('Conflict', 'Referral already exists')
+
+				return {
+					message: 'Referral created successfully',
+					data: result,
+				}
+			},
+			{
+				body: t.Omit(createDoctorSchema, ['doctorId']),
+			}
+		)
 	)
