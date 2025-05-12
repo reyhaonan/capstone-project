@@ -14,7 +14,7 @@ import {
 export const users = pgTable('users', {
 	userId: uuid('user_id').primaryKey().defaultRandom(),
 	name: varchar('name').notNull(),
-	email: varchar('email').notNull(),
+	email: varchar('email').unique().notNull(),
 	password: varchar('password').notNull(),
 	phoneNumber: varchar('phone_number').notNull(),
 	dateOfBirth: date('date_of_birth').notNull(),
@@ -28,7 +28,7 @@ export const doctors = pgTable('doctors', {
 	name: varchar('name').notNull(),
 	specialization: varchar('specialization').notNull(),
 	licenseNumber: varchar('license_number').notNull(),
-	email: varchar('email').notNull(),
+	email: varchar('email').unique().notNull(),
 	phoneNumber: varchar('phone_number').notNull(),
 	hospitalAffiliation: varchar('hospital_affiliation'),
 	password: varchar('password').notNull(),
