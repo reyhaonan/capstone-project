@@ -171,31 +171,41 @@ export const doctorRoutes = new Elysia({
 
 	// Authenticated routes
 	// These routes require the user to be authenticated
-
-	.use(doctorAuthPlugin)
-
-	.get('/me', ({ doctor }) => {
-		return {
-			message: 'Doctor information retrieved successfully',
-			data: {
-				user: {
-					name: doctor.name,
-					email: doctor.email,
-					password: doctor.password,
-					phoneNumber: doctor.phoneNumber,
-					hospitalAffiliation: doctor.hospitalAffiliation,
-					specialization: doctor.specialization,
-					licenseNumber: doctor.licenseNumber,
-				},
+	.group(
+		'',
+		{
+			detail: {
+				description: 'Authenticated routes',
+				tags: ['Authenticated Doctor'],
 			},
-		}
-	})
+		},
+		(app) =>
+			app
+				.use(doctorAuthPlugin)
 
-	.post('/logout', async ({ cookie: { accessToken, refreshToken } }) => {
-		accessToken.remove()
-		refreshToken.remove()
+				.get('/me', ({ doctor }) => {
+					return {
+						message: 'Doctor information retrieved successfully',
+						data: {
+							user: {
+								name: doctor.name,
+								email: doctor.email,
+								password: doctor.password,
+								phoneNumber: doctor.phoneNumber,
+								hospitalAffiliation: doctor.hospitalAffiliation,
+								specialization: doctor.specialization,
+								licenseNumber: doctor.licenseNumber,
+							},
+						},
+					}
+				})
 
-		return {
-			message: 'Logout successful',
-		}
-	})
+				.post('/logout', async ({ cookie: { accessToken, refreshToken } }) => {
+					accessToken.remove()
+					refreshToken.remove()
+
+					return {
+						message: 'Logout successful',
+					}
+				})
+	)

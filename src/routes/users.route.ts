@@ -172,40 +172,50 @@ export const userRoutes = new Elysia({
 
 	// Authenticated routes
 	// These routes require the user to be authenticated
-
-	.use(userAuthPlugin)
-
-	.get(
-		'/searchDoctor',
-		async ({ query }) => {
-			const data = await searchDoctors(query)
-		},
+	.group(
+		'',
 		{
-			query: searchDoctorsSchema,
-		}
-	)
-
-	.get('/me', ({ user }) => {
-		return {
-			message: 'User information retrieved successfully',
-			data: {
-				user: {
-					userId: user.userId,
-					name: user.name,
-					email: user.email,
-					phoneNumber: user.phoneNumber,
-					dateOfBirth: user.dateOfBirth,
-					address: user.address,
-					createdAt: user.createdAt,
-				},
+			detail: {
+				description: 'Authenticated routes',
+				tags: ['Authenticated User'],
 			},
-		}
-	})
-	.post('/logout', async ({ cookie: { accessToken, refreshToken } }) => {
-		accessToken.remove()
-		refreshToken.remove()
+		},
+		(app) =>
+			app
+				.use(userAuthPlugin)
 
-		return {
-			message: 'Logout successful',
-		}
-	})
+				.get(
+					'/searchDoctor',
+					async ({ query }) => {
+						const data = await searchDoctors(query)
+					},
+					{
+						query: searchDoctorsSchema,
+					}
+				)
+
+				.get('/me', ({ user }) => {
+					return {
+						message: 'User information retrieved successfully',
+						data: {
+							user: {
+								userId: user.userId,
+								name: user.name,
+								email: user.email,
+								phoneNumber: user.phoneNumber,
+								dateOfBirth: user.dateOfBirth,
+								address: user.address,
+								createdAt: user.createdAt,
+							},
+						},
+					}
+				})
+				.post('/logout', async ({ cookie: { accessToken, refreshToken } }) => {
+					accessToken.remove()
+					refreshToken.remove()
+
+					return {
+						message: 'Logout successful',
+					}
+				})
+	)

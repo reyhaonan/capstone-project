@@ -3,8 +3,11 @@ import { userRoutes } from './routes/users.route'
 import { doctorRoutes } from './routes/doctors.route'
 import cors from '@elysiajs/cors'
 import swagger from '@elysiajs/swagger'
+import { referralRoutes } from '@/routes/doctorReferral.route'
 
-const app = new Elysia()
+const app = new Elysia({
+	sanitize: (value) => Bun.escapeHTML(value),
+})
 	.use(cors())
 	.use(
 		swagger({
@@ -13,6 +16,7 @@ const app = new Elysia()
 	)
 	.use(userRoutes)
 	.use(doctorRoutes)
+	.use(referralRoutes)
 	.listen(3000)
 
 console.log(

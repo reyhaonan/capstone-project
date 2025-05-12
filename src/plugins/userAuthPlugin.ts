@@ -3,10 +3,7 @@ import { getUserById } from '@/repositories/users.repository'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 import { Role } from '@/types/enums/role.enum'
 
-const userAuthPlugin = new Elysia({
-	name: 'UserAuthPlugin',
-	detail: { tags: ['UserAuth'] },
-})
+const userAuthPlugin = new Elysia()
 	.use(jwtPlugin)
 	.derive(
 		{ as: 'scoped' },
