@@ -10,6 +10,7 @@ import {
 	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core'
+import { doctorSpecialization } from '@/types/enums/specialization.enum'
 
 export const users = pgTable('users', {
 	userId: uuid('user_id').primaryKey().defaultRandom(),
@@ -23,10 +24,15 @@ export const users = pgTable('users', {
 	updatedAt: timestamp('updated_at').defaultNow(),
 })
 
+export const doctorSpecializationEnum = pgEnum(
+	'doctor_specialization',
+	doctorSpecialization
+)
+
 export const doctors = pgTable('doctors', {
 	doctorId: uuid('doctor_id').primaryKey().defaultRandom(),
 	name: varchar('name').notNull(),
-	specialization: varchar('specialization').notNull(),
+	specialization: doctorSpecializationEnum('specialization').notNull(),
 	licenseNumber: varchar('license_number').notNull(),
 	email: varchar('email').unique().notNull(),
 	phoneNumber: varchar('phone_number').notNull(),

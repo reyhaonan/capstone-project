@@ -7,10 +7,11 @@ import {
 } from '@/repositories/users.repository'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { getExpTimestamp } from '@/utils'
-import { createUserSchema } from '@/types/users.types'
+import { createUserSchema, searchDoctorsSchema } from '@/types/users.types'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 import { Role } from '@/types/enums/role.enum'
 import { userAuthPlugin } from '@/plugins/userAuthPlugin'
+import { searchDoctors } from '@/repositories/doctors.repository'
 
 const { users } = dbModel.insert
 
@@ -172,6 +173,16 @@ export const userRoutes = new Elysia({
 	// These routes require the user to be authenticated
 
 	.use(userAuthPlugin)
+
+	.get(
+		'/searchDoctor',
+		async ({ query }) => {
+			const data = await searchDoctors(query)
+		},
+		{
+			query: searchDoctorsSchema,
+		}
+	)
 
 	.get('/me', ({ user }) => {
 		return {
