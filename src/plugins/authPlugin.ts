@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { getUserById } from '@/repositories/users'
+import { getUserById } from '@/repositories/users.repository'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
 
 const authPlugin = new Elysia()

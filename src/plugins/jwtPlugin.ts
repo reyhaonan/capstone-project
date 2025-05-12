@@ -2,7 +2,7 @@ import jwt from '@elysiajs/jwt'
 import { getExpTimestamp } from '@/utils'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { Elysia, t } from 'elysia'
-import { Role } from '@/types/role.enum'
+import { Role } from '@/types/enums/role.enum'
 
 export const jwtPlugin = new Elysia()
 	.use(

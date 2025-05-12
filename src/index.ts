@@ -1,8 +1,8 @@
 import { Elysia } from 'elysia'
-import { websocketRoutes } from './routes/websocket'
-import { chatRoutes } from './routes/chat'
-import { userRoutes } from './routes/user'
-import { doctorRoutes } from './routes/doctor'
+import { websocketRoutes } from './routes/websocket.route'
+import { chatRoutes } from './routes/chat.route'
+import { userRoutes } from './routes/user.route'
+import { doctorRoutes } from './routes/doctor.route'
 import cors from '@elysiajs/cors'
 import swagger from '@elysiajs/swagger'
 

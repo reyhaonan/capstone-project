@@ -1,11 +1,15 @@
 import { Elysia, t } from 'elysia'
 import { dbModel } from '@/db/model'
-import { createUser, getUserByEmail, getUserById } from '@/repositories/users'
+import {
+	createUser,
+	getUserByEmail,
+	getUserById,
+} from '@/repositories/users.repository'
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from '@/config/constants'
 import { getExpTimestamp } from '@/utils'
-import { createUserSchema } from '@/types/users.typebox'
+import { createUserSchema } from '@/types/users.types'
 import { jwtPlugin } from '@/plugins/jwtPlugin'
-import { Role } from '@/types/role.enum'
+import { Role } from '@/types/enums/role.enum'
 
 const { users } = dbModel.insert
 
