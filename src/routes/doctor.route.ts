@@ -142,6 +142,36 @@ export const doctorRoutes = new Elysia({
 		}
 	)
 
+	.get(
+		'/:doctorId',
+		async ({ params: { doctorId } }) => {
+			const doctor = await getDoctorById(doctorId)
+
+			if (!doctor) return { message: 'Doctor not found', data: null }
+
+			return {
+				message: 'Doctor information retrieved successfully',
+				data: {
+					name: doctor.name,
+					email: doctor.email,
+					password: doctor.password,
+					phoneNumber: doctor.phoneNumber,
+					hospitalAffiliation: doctor.hospitalAffiliation,
+					specialization: doctor.specialization,
+					licenseNumber: doctor.licenseNumber,
+				},
+			}
+		},
+		{
+			params: t.Object({
+				doctorId: t.String(),
+			}),
+		}
+	)
+
+	// Authenticated routes
+	// These routes require the user to be authenticated
+
 	.use(doctorAuthPlugin)
 
 	.get('/me', ({ doctor }) => {

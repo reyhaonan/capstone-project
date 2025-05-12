@@ -140,7 +140,39 @@ export const userRoutes = new Elysia({
 			}
 		}
 	)
+
+	.get(
+		'/:userId',
+		async ({ params: { userId } }) => {
+			const user = await getUserById(userId)
+
+			if (!user) return { message: 'User not found', data: null }
+
+			return {
+				message: 'User information retrieved successfully',
+				data: {
+					userId: user.userId,
+					name: user.name,
+					email: user.email,
+					phoneNumber: user.phoneNumber,
+					dateOfBirth: user.dateOfBirth,
+					address: user.address,
+					createdAt: user.createdAt,
+				},
+			}
+		},
+		{
+			params: t.Object({
+				userId: t.String(),
+			}),
+		}
+	)
+
+	// Authenticated routes
+	// These routes require the user to be authenticated
+
 	.use(userAuthPlugin)
+
 	.get('/me', ({ user }) => {
 		return {
 			message: 'User information retrieved successfully',
