@@ -13,6 +13,17 @@ import {
 } from 'drizzle-orm/pg-core'
 import { doctorSpecialization } from '@/types/enums/specialization.enum'
 
+const time = {
+	createdAt: timestamp('created_at', {
+		precision: 0,
+		withTimezone: true,
+	}).defaultNow(),
+	updatedAt: timestamp('updated_at', {
+		precision: 0,
+		withTimezone: true,
+	}).defaultNow(),
+}
+
 export const users = pgTable('users', {
 	userId: uuid('user_id').primaryKey().defaultRandom(),
 	name: varchar('name').notNull(),
@@ -21,8 +32,7 @@ export const users = pgTable('users', {
 	phoneNumber: varchar('phone_number').notNull(),
 	dateOfBirth: date('date_of_birth').notNull(),
 	address: text('address'),
-	createdAt: timestamp('created_at').defaultNow(),
-	updatedAt: timestamp('updated_at').defaultNow(),
+	...time,
 })
 
 export const doctorSpecializationEnum = pgEnum(
@@ -39,8 +49,7 @@ export const doctors = pgTable('doctors', {
 	phoneNumber: varchar('phone_number').notNull(),
 	hospitalAffiliation: varchar('hospital_affiliation'),
 	password: varchar('password').notNull(),
-	createdAt: timestamp('created_at').defaultNow(),
-	updatedAt: timestamp('updated_at').defaultNow(),
+	...time,
 })
 
 export const statusEnum = pgEnum('status', ['ONGOING', 'CLOSED'])
@@ -54,8 +63,8 @@ export const usersDoctors = pgTable(
 		doctorId: uuid('doctor_id')
 			.notNull()
 			.references(() => doctors.doctorId),
-		createdAt: timestamp('created_at').defaultNow(),
 		status: statusEnum('status').notNull().default('ONGOING'),
+		...time,
 	},
 	(table) => [
 		primaryKey({ columns: [table.userId, table.doctorId] }),
@@ -71,8 +80,7 @@ export const chats = pgTable(
 		doctorId: uuid('doctor_id').notNull(),
 		message: text('message').notNull(),
 		isFromDoctor: boolean('is_from_doctor').notNull(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').defaultNow(),
+		...time,
 	},
 	(table) => [
 		foreignKey({
@@ -92,8 +100,7 @@ export const doctorReferrals = pgTable(
 		referralReason: text('referral_reason').notNull(),
 		referralDate: date('referral_date').notNull(),
 		notes: text('notes').notNull(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').defaultNow(),
+		...time,
 	},
 	(table) => [
 		foreignKey({
