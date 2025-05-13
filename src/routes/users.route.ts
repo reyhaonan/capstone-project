@@ -287,7 +287,16 @@ export const userRoutes = new Elysia({
 						// ws.publish('chat', message)
 						ws.publish(topic, result)
 					},
-					close(ws) {},
+					close(ws) {
+						const { user, params } = ws.data
+
+						const topic = getWebsocketTopic({
+							userId: user.userId,
+							doctorId: params.doctorId,
+						})
+
+						ws.unsubscribe(topic)
+					},
 					async open(ws) {
 						const { user, params } = ws.data
 
@@ -309,5 +318,3 @@ export const userRoutes = new Elysia({
 					},
 				})
 	)
-
-const openWSConnection = new Map()
