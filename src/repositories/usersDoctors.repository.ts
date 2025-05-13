@@ -4,7 +4,7 @@ import {
 	createUsersDoctorsSchema,
 	selectUsersDoctorsSchema,
 } from '@/types/schema/usersDoctors.schema'
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 
 export const createUsersDoctorsCompositeKey = async ({
 	doctorId,
@@ -19,7 +19,7 @@ export const createUsersDoctorsCompositeKey = async ({
 		})
 		.onConflictDoUpdate({
 			target: [table.usersDoctors.doctorId, table.usersDoctors.userId],
-			set: { status: 'ONGOING' },
+			set: { status: 'ONGOING', updatedAt: new Date() },
 		})
 		.returning()
 }
@@ -48,5 +48,23 @@ export const getUsersDoctors = async (
 			eq(table.usersDoctors.doctorId, body.doctorId),
 			eq(table.usersDoctors.status, body.status)
 		),
+	})
+}
+
+export const getUsersDoctorsByDoctorId = async (
+	body: Pick<typeof selectUsersDoctorsSchema.static, 'doctorId'>
+) => {
+	return db.query.usersDoctors.findMany({
+		where: and(eq(table.usersDoctors.doctorId, body.doctorId)),
+		orderBy: asc(table.usersDoctors.updatedAt),
+	})
+}
+
+export const getUsersDoctorsByUserId = async (
+	body: Pick<typeof selectUsersDoctorsSchema.static, 'userId'>
+) => {
+	return db.query.usersDoctors.findMany({
+		where: and(eq(table.usersDoctors.userId, body.userId)),
+		orderBy: asc(table.usersDoctors.updatedAt),
 	})
 }

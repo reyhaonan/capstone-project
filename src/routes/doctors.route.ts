@@ -13,6 +13,7 @@ import { dbModel } from '@/db/model'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
 import {
 	getUsersDoctors,
+	getUsersDoctorsByDoctorId,
 	updateUsersDoctorsStatus,
 } from '@/repositories/usersDoctors.repository'
 import { createChat, getChatHistory } from '@/repositories/chat.repository'
@@ -252,6 +253,14 @@ export const doctorRoutes = new Elysia({
 						query: t.Omit(selectChatSchema, ['userId', 'doctorId']),
 					}
 				)
+
+				.get('/chat/onGoing', async ({ doctor }) => {
+					const data = await getUsersDoctorsByDoctorId({
+						doctorId: doctor.doctorId,
+					})
+
+					return { data }
+				})
 
 				.ws('/chat/:userId', {
 					body: t.Object({
