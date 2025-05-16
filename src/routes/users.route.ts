@@ -81,6 +81,7 @@ export const userRoutes = new Elysia({
 				value: accessJWTToken,
 				httpOnly: true,
 				sameSite: 'none',
+				secure: true,
 				maxAge: ACCESS_TOKEN_EXP,
 			})
 
@@ -93,6 +94,7 @@ export const userRoutes = new Elysia({
 				value: refreshJWTToken,
 				httpOnly: true,
 				sameSite: 'none',
+				secure: true,
 				maxAge: REFRESH_TOKEN_EXP,
 			})
 
@@ -141,6 +143,7 @@ export const userRoutes = new Elysia({
 				value: accessJWTToken,
 				httpOnly: true,
 				sameSite: 'none',
+				secure: true,
 				maxAge: ACCESS_TOKEN_EXP,
 			})
 
