@@ -321,7 +321,7 @@ export const userRoutes = new Elysia({
 							status: 'ONGOING',
 						})
 
-						if (!result) return ws.close()
+						if (!result) return ws.close(4000, 'No ongoing consultation')
 
 						const topic = getWebsocketTopic({
 							userId: user.userId,
