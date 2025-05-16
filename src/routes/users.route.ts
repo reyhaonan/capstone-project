@@ -287,7 +287,7 @@ export const userRoutes = new Elysia({
 					async message(ws, { message }) {
 						const { user, params } = ws.data
 
-						const result = await createChat({
+						const [result] = await createChat({
 							userId: user.userId,
 							doctorId: params.doctorId,
 							message: message,
@@ -299,6 +299,7 @@ export const userRoutes = new Elysia({
 							doctorId: params.doctorId,
 						})
 
+						ws.send(result)
 						// ws.publish('chat', message)
 						ws.publish(topic, result)
 					},
