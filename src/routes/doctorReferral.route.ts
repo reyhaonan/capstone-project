@@ -1,8 +1,7 @@
 import { Elysia, t } from 'elysia'
-import { agnosticAuthPlugin } from '@/plugins/agnosticAuthPlugin'
 import {
 	createDoctorReferral,
-	getDoctorReferralByIdAndUserDoctorId,
+	getDoctorReferralById,
 } from '@/repositories/doctorReferrals.repository'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
 import { createDoctorReferralSchema } from '@/types/schema/doctorReferral.schema'
@@ -13,15 +12,12 @@ export const referralRoutes = new Elysia({
 	detail: { tags: ['Doctor Referrals'] },
 })
 
-	// Doctor or user can access this route
+	// Anyone can access this route
 	.group('', (app) =>
-		app.use(agnosticAuthPlugin).get(
+		app.get(
 			'/:referralId',
-			async ({ params: { referralId }, id }) => {
-				const referral = await getDoctorReferralByIdAndUserDoctorId(
-					referralId,
-					id
-				)
+			async ({ params: { referralId } }) => {
+				const [referral] = await getDoctorReferralById(referralId)
 
 				if (!referral)
 					return {
