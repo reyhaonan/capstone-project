@@ -260,7 +260,7 @@ export const doctorRoutes = new Elysia({
 					}
 				)
 
-				.get('/chat/onGoing', async ({ doctor }) => {
+				.get('/chat/list', async ({ doctor }) => {
 					const data = await getUsersDoctorsByDoctorId({
 						doctorId: doctor.doctorId,
 					})

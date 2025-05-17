@@ -275,7 +275,7 @@ export const userRoutes = new Elysia({
 					}
 				)
 
-				.get('/chat/onGoing', async ({ user }) => {
+				.get('/chat/list', async ({ user }) => {
 					const data = await getUsersDoctorsByUserId({
 						userId: user.userId,
 					})
