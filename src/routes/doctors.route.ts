@@ -272,7 +272,7 @@ export const doctorRoutes = new Elysia({
 				.ws('/chat/:userId', {
 					body: t.Object({
 						message: t.String(),
-						messageType: t.Enum(MessageType).default(MessageType.TEXT),
+						messageType: t.Enum(MessageType),
 					}),
 					params: t.Object({
 						userId: usersDoctors.userId,
