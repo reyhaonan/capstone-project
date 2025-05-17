@@ -50,7 +50,7 @@ export const referralRoutes = new Elysia({
 		app.use(doctorAuthPlugin).post(
 			'/create',
 			async ({ body, doctor, status }) => {
-				const result = await createDoctorReferral({
+				const [result] = await createDoctorReferral({
 					...body,
 					doctorId: doctor.doctorId,
 				})
