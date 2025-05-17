@@ -8,6 +8,7 @@ export const createChatSchema = t.Object({
 	userId: chatsInsert.userId,
 	doctorId: chatsInsert.doctorId,
 	message: chatsInsert.message,
+	messageType: chatsInsert.messageType,
 	isFromDoctor: chatsInsert.isFromDoctor,
 })
 

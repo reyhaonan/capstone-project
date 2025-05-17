@@ -12,6 +12,7 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core'
 import { doctorSpecialization } from '@/types/enums/specialization.enum'
+import { MessageType } from '@/types/enums/messageType.enum'
 
 const time = {
 	createdAt: timestamp('created_at', {
@@ -72,6 +73,11 @@ export const usersDoctors = pgTable(
 	]
 )
 
+export const messageTypeEnum = pgEnum('message_type', [
+	MessageType.REFERRAL,
+	MessageType.TEXT,
+])
+
 export const chats = pgTable(
 	'chats',
 	{
@@ -79,6 +85,7 @@ export const chats = pgTable(
 		userId: uuid('user_id').notNull(),
 		doctorId: uuid('doctor_id').notNull(),
 		message: text('message').notNull(),
+		messageType: messageTypeEnum('message_type').notNull(),
 		isFromDoctor: boolean('is_from_doctor').notNull(),
 		...time,
 	},

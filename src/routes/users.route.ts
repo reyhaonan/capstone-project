@@ -20,6 +20,7 @@ import {
 } from '@/repositories/usersDoctors.repository'
 import { createChat, getChatHistory } from '@/repositories/chat.repository'
 import { selectChatSchema } from '@/types/schema/chats.schema'
+import { MessageType } from '@/types/enums/messageType.enum'
 
 const { users, usersDoctors } = dbModel.insert
 
@@ -297,6 +298,7 @@ export const userRoutes = new Elysia({
 							userId: user.userId,
 							doctorId: params.doctorId,
 							message: message,
+							messageType: MessageType.TEXT,
 							isFromDoctor: false,
 						})
 
