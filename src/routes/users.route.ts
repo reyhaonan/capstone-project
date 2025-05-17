@@ -214,11 +214,17 @@ export const userRoutes = new Elysia({
 
 				.post(
 					'/initiate-consultation',
-					({ body: { doctorId }, user }) => {
-						const result = createUsersDoctorsCompositeKey({
+					async ({ body: { doctorId }, user }) => {
+						const [result] = await createUsersDoctorsCompositeKey({
 							doctorId,
 							userId: user.userId,
 						})
+
+						if (result) {
+							return {
+								message: 'Consultation initiated successfully',
+							}
+						}
 					},
 					{
 						body: t.Object({
