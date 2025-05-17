@@ -3,7 +3,7 @@ import { dbModel } from '@/db/model'
 
 const { doctorReferrals } = dbModel.insert
 
-export const createDoctorSchema = t.Object({
+export const createDoctorReferralSchema = t.Object({
 	userId: doctorReferrals.userId,
 	doctorId: doctorReferrals.doctorId,
 	referralReason: doctorReferrals.referralReason,

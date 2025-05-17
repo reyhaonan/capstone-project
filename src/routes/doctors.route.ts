@@ -18,6 +18,7 @@ import {
 } from '@/repositories/usersDoctors.repository'
 import { createChat, getChatHistory } from '@/repositories/chat.repository'
 import { selectChatSchema } from '@/types/schema/chats.schema'
+import { MessageType } from '@/types/enums/messageType.enum'
 
 const { doctors, usersDoctors } = dbModel.insert
 
@@ -271,11 +272,12 @@ export const doctorRoutes = new Elysia({
 				.ws('/chat/:userId', {
 					body: t.Object({
 						message: t.String(),
+						messageType: t.Enum(MessageType).default(MessageType.TEXT),
 					}),
 					params: t.Object({
 						userId: usersDoctors.userId,
 					}),
-					async message(ws, { message }) {
+					async message(ws, { message, messageType }) {
 						const { doctor, params } = ws.data
 
 						const [result] = await createChat({
@@ -290,9 +292,11 @@ export const doctorRoutes = new Elysia({
 							doctorId: doctor.doctorId,
 						})
 
-						ws.send(result)
+						const content = { ...result, messageType }
+
+						ws.send(content)
 						// ws.publish('chat', message)
-						ws.publish(topic, result)
+						ws.publish(topic, content)
 					},
 					close(ws) {
 						const { doctor, params } = ws.data

@@ -5,7 +5,7 @@ import {
 	getDoctorReferralByIdAndUserDoctorId,
 } from '@/repositories/doctorReferrals.repository'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
-import { createDoctorSchema } from '@/types/schema/doctorReferral.schema'
+import { createDoctorReferralSchema } from '@/types/schema/doctorReferral.schema'
 
 export const referralRoutes = new Elysia({
 	prefix: '/referral',
@@ -63,7 +63,7 @@ export const referralRoutes = new Elysia({
 				}
 			},
 			{
-				body: t.Omit(createDoctorSchema, ['doctorId']),
+				body: t.Omit(createDoctorReferralSchema, ['doctorId']),
 			}
 		)
 	)
