@@ -284,6 +284,7 @@ export const doctorRoutes = new Elysia({
 							userId: params.userId,
 							doctorId: doctor.doctorId,
 							message: message,
+							messageType,
 							isFromDoctor: true,
 						})
 
@@ -292,11 +293,9 @@ export const doctorRoutes = new Elysia({
 							doctorId: doctor.doctorId,
 						})
 
-						const content = { ...result, messageType }
-
-						ws.send(content)
+						ws.send(result)
 						// ws.publish('chat', message)
-						ws.publish(topic, content)
+						ws.publish(topic, result)
 					},
 					close(ws) {
 						const { doctor, params } = ws.data
