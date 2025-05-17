@@ -166,12 +166,8 @@ export const doctorRoutes = new Elysia({
 				message: 'Doctor information retrieved successfully',
 				data: {
 					name: doctor.name,
-					email: doctor.email,
-					password: doctor.password,
-					phoneNumber: doctor.phoneNumber,
 					hospitalAffiliation: doctor.hospitalAffiliation,
 					specialization: doctor.specialization,
-					licenseNumber: doctor.licenseNumber,
 				},
 			}
 		},
