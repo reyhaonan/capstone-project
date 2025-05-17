@@ -262,11 +262,16 @@ export const userRoutes = new Elysia({
 				.get(
 					'/chat/:doctorId/history',
 					async ({ params: { doctorId }, query, user }) => {
-						return getChatHistory({
+						const result = await getChatHistory({
 							userId: user.userId,
 							doctorId: doctorId,
 							...query,
 						})
+
+						return {
+							message: 'Chat history retrieved successfully',
+							data: result,
+						}
 					},
 					{
 						params: t.Object({
@@ -281,7 +286,7 @@ export const userRoutes = new Elysia({
 						userId: user.userId,
 					})
 
-					return { data }
+					return { message: 'Chat list retrieved successfully', data }
 				})
 
 				.ws('/chat/:doctorId', {
