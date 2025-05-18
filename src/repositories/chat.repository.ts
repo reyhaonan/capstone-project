@@ -12,14 +12,29 @@ export const getChatHistory = async (query: typeof selectChatSchema.static) => {
 
 	dateFilters.push(lte(table.chats.createdAt, query.endDate || new Date()))
 
-	return db.query.chats.findMany({
-		where: and(
-			eq(table.chats.userId, query.userId),
-			eq(table.chats.doctorId, query.doctorId),
-			...(dateFilters.length > 0 ? [...dateFilters] : [])
-		),
-		orderBy: asc(table.chats.createdAt),
-	})
+	return db
+		.select({
+			chatId: table.chats.chatId,
+			message: table.chats.message,
+			createdAt: table.chats.createdAt,
+			isFromDoctor: table.chats.isFromDoctor,
+			userId: table.chats.userId,
+			doctorId: table.chats.doctorId,
+			messageType: table.chats.messageType,
+			userName: table.users.name,
+			doctorName: table.doctors.name,
+		})
+		.from(table.chats)
+		.where(
+			and(
+				eq(table.chats.userId, query.userId),
+				eq(table.chats.doctorId, query.doctorId),
+				...(dateFilters.length > 0 ? [...dateFilters] : [])
+			)
+		)
+		.orderBy(asc(table.chats.createdAt))
+		.leftJoin(table.users, eq(table.users.userId, table.chats.userId))
+		.leftJoin(table.doctors, eq(table.doctors.doctorId, table.chats.doctorId))
 }
 
 export const createChat = async (body: typeof createChatSchema.static) => {
