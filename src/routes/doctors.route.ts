@@ -13,7 +13,7 @@ import { dbModel } from '@/db/model'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
 import {
 	getUsersDoctors,
-	getUsersDoctorsByDoctorId,
+	getUsersDoctorsDetail,
 	updateUsersDoctorsStatus,
 } from '@/repositories/usersDoctors.repository'
 import { createChat, getChatHistory } from '@/repositories/chat.repository'
@@ -263,7 +263,7 @@ export const doctorRoutes = new Elysia({
 				)
 
 				.get('/chat/list', async ({ doctor }) => {
-					const data = await getUsersDoctorsByDoctorId({
+					const data = await getUsersDoctorsDetail({
 						doctorId: doctor.doctorId,
 					})
 

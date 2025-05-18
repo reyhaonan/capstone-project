@@ -4,7 +4,7 @@ import {
 	createUsersDoctorsSchema,
 	selectUsersDoctorsSchema,
 } from '@/types/schema/usersDoctors.schema'
-import { and, asc, eq } from 'drizzle-orm'
+import { and, desc, eq, SQL } from 'drizzle-orm'
 
 export const createUsersDoctorsCompositeKey = async ({
 	doctorId,
@@ -51,20 +51,61 @@ export const getUsersDoctors = async (
 	})
 }
 
-export const getUsersDoctorsByDoctorId = async (
-	body: Pick<typeof selectUsersDoctorsSchema.static, 'doctorId'>
-) => {
-	return db.query.usersDoctors.findMany({
-		where: and(eq(table.usersDoctors.doctorId, body.doctorId)),
-		orderBy: asc(table.usersDoctors.updatedAt),
-	})
-}
+type UserDoctorFilter = { userId?: string; doctorId?: string }
 
-export const getUsersDoctorsByUserId = async (
-	body: Pick<typeof selectUsersDoctorsSchema.static, 'userId'>
-) => {
-	return db.query.usersDoctors.findMany({
-		where: and(eq(table.usersDoctors.userId, body.userId)),
-		orderBy: asc(table.usersDoctors.updatedAt),
-	})
+export const getUsersDoctorsDetail = async ({
+	userId,
+	doctorId,
+}: UserDoctorFilter) => {
+	const latestChat = db
+		.select()
+		.from(table.chats)
+		.orderBy(desc(table.chats.createdAt))
+		.limit(1)
+		.as('latestChat')
+
+	const whereConditions: SQL[] = [] // Array to hold where conditions
+
+	if (userId) {
+		whereConditions.push(eq(table.usersDoctors.userId, userId))
+	}
+	if (doctorId) {
+		whereConditions.push(eq(table.usersDoctors.doctorId, doctorId))
+	}
+
+	if (!userId && !doctorId) {
+		throw new Error('Either userId or doctorId must be provided')
+	}
+
+	return db
+		.select({
+			userId: table.usersDoctors.userId,
+			doctorId: table.usersDoctors.doctorId,
+			status: table.usersDoctors.status,
+			updatedAt: table.usersDoctors.updatedAt,
+			userName: table.users.name,
+			doctorName: table.doctors.name,
+			latestChat: {
+				chatId: latestChat.chatId,
+				message: latestChat.message,
+				messageType: latestChat.messageType,
+				isFromDoctor: latestChat.isFromDoctor,
+				createdAt: latestChat.createdAt,
+			},
+		})
+		.from(table.usersDoctors)
+		.where(and(...whereConditions))
+		.leftJoin(table.users, eq(table.users.userId, table.usersDoctors.userId))
+		.leftJoin(
+			table.doctors,
+			eq(table.doctors.doctorId, table.usersDoctors.doctorId)
+		)
+		.leftJoin(
+			latestChat,
+			and(
+				eq(table.usersDoctors.userId, latestChat.userId),
+				eq(table.usersDoctors.doctorId, latestChat.doctorId)
+			)
+		)
+		.orderBy(desc(latestChat.createdAt))
 }

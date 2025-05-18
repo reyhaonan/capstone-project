@@ -16,7 +16,7 @@ import { searchDoctorsSchema } from '@/types/schema/doctors.schema'
 import {
 	createUsersDoctorsCompositeKey,
 	getUsersDoctors,
-	getUsersDoctorsByUserId,
+	getUsersDoctorsDetail,
 } from '@/repositories/usersDoctors.repository'
 import { createChat, getChatHistory } from '@/repositories/chat.repository'
 import { selectChatSchema } from '@/types/schema/chats.schema'
@@ -282,7 +282,7 @@ export const userRoutes = new Elysia({
 				)
 
 				.get('/chat/list', async ({ user }) => {
-					const data = await getUsersDoctorsByUserId({
+					const data = await getUsersDoctorsDetail({
 						userId: user.userId,
 					})
 
