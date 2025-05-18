@@ -10,6 +10,7 @@ export const getDoctorReferralById = async (referralId: string) => {
 			referralDate: table.doctorReferrals.referralDate,
 			referralReason: table.doctorReferrals.referralReason,
 			notes: table.doctorReferrals.notes,
+			createdAt: table.doctorReferrals.createdAt,
 			doctorId: table.doctorReferrals.doctorId,
 			userId: table.doctorReferrals.userId,
 			doctorName: table.doctors.name,
