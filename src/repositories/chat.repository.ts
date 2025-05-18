@@ -1,7 +1,7 @@
 import { db } from '@/db'
 import { table } from '@/db/schema'
 import { createChatSchema, selectChatSchema } from '@/types/schema/chats.schema'
-import { and, asc, eq, gte, lte, SQL } from 'drizzle-orm'
+import { and, desc, eq, gte, lte, SQL } from 'drizzle-orm'
 
 export const getChatHistory = async (query: typeof selectChatSchema.static) => {
 	const dateFilters: SQL[] = []
@@ -18,7 +18,7 @@ export const getChatHistory = async (query: typeof selectChatSchema.static) => {
 			eq(table.chats.doctorId, query.doctorId),
 			...(dateFilters.length > 0 ? [...dateFilters] : [])
 		),
-		orderBy: asc(table.chats.createdAt),
+		orderBy: desc(table.chats.createdAt),
 	})
 }
 
