@@ -2,15 +2,47 @@ import { Elysia, t } from 'elysia'
 import {
 	createDoctorReferral,
 	getDoctorReferralById,
+	getDoctorReferralsByUserOrDoctorId,
 } from '@/repositories/doctorReferrals.repository'
 import { doctorAuthPlugin } from '@/plugins/doctorAuthPlugin'
 import { createDoctorReferralSchema } from '@/types/schema/doctorReferral.schema'
+import { agnosticAuthPlugin } from '@/plugins/agnosticAuthPlugin'
 
 export const referralRoutes = new Elysia({
 	prefix: '/referral',
 	name: 'Doctor Referrals',
 	detail: { tags: ['Doctor Referrals'] },
 })
+
+	// Doctor or user can access this route
+	.group('', (app) =>
+		app.use(agnosticAuthPlugin).get(
+			'/referrals',
+			async ({ params: { referralId }, id }) => {
+				const referrals = await getDoctorReferralsByUserOrDoctorId(id)
+
+				if (!referrals)
+					return {
+						message: 'Referral not found',
+						data: null,
+					}
+				return {
+					message: 'Referral information retrieved successfully',
+					data: {
+						...referrals,
+					},
+				}
+			},
+			{
+				params: t.Object({
+					referralId: t.String(),
+				}),
+				detail: {
+					description: 'Only relevant user or doctor can fetch the referral',
+				},
+			}
+		)
+	)
 
 	// Anyone can access this route
 	.group('', (app) =>

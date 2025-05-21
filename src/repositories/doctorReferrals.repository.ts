@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import { table } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { desc, eq, or } from 'drizzle-orm'
 import { createDoctorReferralSchema } from '@/types/schema/doctorReferral.schema'
 
 export const getDoctorReferralById = async (referralId: string) => {
@@ -24,6 +24,19 @@ export const getDoctorReferralById = async (referralId: string) => {
 			eq(table.doctors.doctorId, table.doctorReferrals.doctorId)
 		)
 		.limit(1)
+}
+
+export const getDoctorReferralsByUserOrDoctorId = async (id: string) => {
+	return db
+		.select()
+		.from(table.doctorReferrals)
+		.where(
+			or(
+				eq(table.doctorReferrals.userId, id),
+				eq(table.doctorReferrals.doctorId, id)
+			)
+		)
+		.orderBy(desc(table.doctorReferrals.createdAt))
 }
 
 export const createDoctorReferral = async (
