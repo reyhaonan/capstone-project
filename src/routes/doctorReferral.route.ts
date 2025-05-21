@@ -28,9 +28,7 @@ export const referralRoutes = new Elysia({
 					}
 				return {
 					message: 'Referral information retrieved successfully',
-					data: {
-						...referrals,
-					},
+					data: [...referrals],
 				}
 			},
 			{
