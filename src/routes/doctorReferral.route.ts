@@ -15,7 +15,7 @@ export const referralRoutes = new Elysia({
 	.group('', (app) =>
 		app.use(agnosticAuthPlugin).get(
 			'',
-			async ({ params: { referralId }, id }) => {
+			async ({ id }) => {
 				const referrals = await getDoctorReferralsByUserOrDoctorId(id)
 
 				if (!referrals)
@@ -31,9 +31,6 @@ export const referralRoutes = new Elysia({
 				}
 			},
 			{
-				params: t.Object({
-					referralId: t.String(),
-				}),
 				detail: {
 					description: 'Only relevant user or doctor can fetch the referral',
 				},
