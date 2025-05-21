@@ -2,6 +2,8 @@ export enum MessageType {
 	// Text message
 	TEXT = 'text',
 	REFERRAL = 'referral',
+	CONVERSATION_START = 'conversation_start',
+	CONVERSATION_END = 'conversation_end',
 	// // Image message
 	// IMAGE = 'image',
 	// // Video message

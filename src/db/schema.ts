@@ -76,6 +76,8 @@ export const usersDoctors = pgTable(
 export const messageTypeEnum = pgEnum('message_type', [
 	MessageType.REFERRAL,
 	MessageType.TEXT,
+	MessageType.CONVERSATION_START,
+	MessageType.CONVERSATION_END,
 ])
 
 export const chats = pgTable(

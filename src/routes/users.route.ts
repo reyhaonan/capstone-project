@@ -216,15 +216,21 @@ export const userRoutes = new Elysia({
 				.post(
 					'/initiate-consultation',
 					async ({ body: { doctorId }, user }) => {
-						const [result] = await createUsersDoctorsCompositeKey({
+						await createUsersDoctorsCompositeKey({
 							doctorId,
 							userId: user.userId,
 						})
 
-						if (result) {
-							return {
-								message: 'Consultation initiated successfully',
-							}
+						await createChat({
+							userId: user.userId,
+							doctorId,
+							message: 'Conversation Start',
+							messageType: MessageType.CONVERSATION_START,
+							isFromDoctor: false,
+						})
+
+						return {
+							message: 'Consultation initiated successfully',
 						}
 					},
 					{

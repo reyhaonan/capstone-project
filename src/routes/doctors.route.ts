@@ -192,27 +192,6 @@ export const doctorRoutes = new Elysia({
 			app
 				.use(doctorAuthPlugin)
 
-				.post(
-					'/conclude-consultation',
-					({ body: { userId }, doctor }) => {
-						const result = updateUsersDoctorsStatus({
-							doctorId: doctor.doctorId,
-							userId,
-							status: 'CLOSED',
-						})
-
-						return {
-							message: 'Consultation concluded successfully',
-							data: result,
-						}
-					},
-					{
-						body: t.Object({
-							userId: usersDoctors.userId,
-						}),
-					}
-				)
-
 				.get('/me', ({ doctor }) => {
 					return {
 						message: 'Doctor information retrieved successfully',
@@ -281,6 +260,17 @@ export const doctorRoutes = new Elysia({
 					async message(ws, { message, messageType }) {
 						const { doctor, params } = ws.data
 
+						if (messageType === MessageType.CONVERSATION_END) {
+							const result = await updateUsersDoctorsStatus({
+								doctorId: doctor.doctorId,
+								userId: params.userId,
+								status: 'CLOSED',
+							})
+
+							if (!result)
+								return ws.close(4002, 'Failed to update consultation status')
+						}
+
 						const [result] = await createChat({
 							userId: params.userId,
 							doctorId: doctor.doctorId,
@@ -295,8 +285,11 @@ export const doctorRoutes = new Elysia({
 						})
 
 						ws.send(result)
-						// ws.publish('chat', message)
 						ws.publish(topic, result)
+
+						if (messageType === MessageType.CONVERSATION_END) {
+							ws.close(4001, 'Conversation ended')
+						}
 					},
 					close(ws) {
 						const { doctor, params } = ws.data
