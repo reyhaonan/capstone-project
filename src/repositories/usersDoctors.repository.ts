@@ -4,7 +4,7 @@ import {
 	createUsersDoctorsSchema,
 	selectUsersDoctorsSchema,
 } from '@/types/schema/usersDoctors.schema'
-import { and, desc, eq, SQL } from 'drizzle-orm'
+import { and, desc, eq, sql, SQL } from 'drizzle-orm'
 
 export const createUsersDoctorsCompositeKey = async ({
 	doctorId,
@@ -57,14 +57,7 @@ export const getUsersDoctorsDetail = async ({
 	userId,
 	doctorId,
 }: UserDoctorFilter) => {
-	const latestChat = db
-		.select()
-		.from(table.chats)
-		.orderBy(desc(table.chats.createdAt))
-		.limit(1)
-		.as('latestChat')
-
-	const whereConditions: SQL[] = [] // Array to hold where conditions
+	const whereConditions: SQL[] = []
 
 	if (userId) {
 		whereConditions.push(eq(table.usersDoctors.userId, userId))
@@ -77,7 +70,26 @@ export const getUsersDoctorsDetail = async ({
 		throw new Error('Either userId or doctorId must be provided')
 	}
 
+	const latestChatCTE = db.$with('latest_chat_cte').as(
+		db
+			.select({
+				chatId: table.chats.chatId,
+				message: table.chats.message,
+				messageType: table.chats.messageType,
+				isFromDoctor: table.chats.isFromDoctor,
+				createdAt: table.chats.createdAt,
+				userId: table.chats.userId,
+				doctorId: table.chats.doctorId,
+
+				rn: sql`ROW_NUMBER() OVER (PARTITION BY ${table.chats.userId}, ${table.chats.doctorId} ORDER BY ${table.chats.createdAt} DESC)`.as(
+					'rn'
+				),
+			})
+			.from(table.chats)
+	)
+
 	return db
+		.with(latestChatCTE)
 		.select({
 			userId: table.usersDoctors.userId,
 			doctorId: table.usersDoctors.doctorId,
@@ -86,11 +98,11 @@ export const getUsersDoctorsDetail = async ({
 			userName: table.users.name,
 			doctorName: table.doctors.name,
 			latestChat: {
-				chatId: latestChat.chatId,
-				message: latestChat.message,
-				messageType: latestChat.messageType,
-				isFromDoctor: latestChat.isFromDoctor,
-				createdAt: latestChat.createdAt,
+				chatId: latestChatCTE.chatId,
+				message: latestChatCTE.message,
+				messageType: latestChatCTE.messageType,
+				isFromDoctor: latestChatCTE.isFromDoctor,
+				createdAt: latestChatCTE.createdAt,
 			},
 		})
 		.from(table.usersDoctors)
@@ -101,11 +113,12 @@ export const getUsersDoctorsDetail = async ({
 			eq(table.doctors.doctorId, table.usersDoctors.doctorId)
 		)
 		.leftJoin(
-			latestChat,
+			latestChatCTE,
 			and(
-				eq(table.usersDoctors.userId, latestChat.userId),
-				eq(table.usersDoctors.doctorId, latestChat.doctorId)
+				eq(table.usersDoctors.userId, latestChatCTE.userId),
+				eq(table.usersDoctors.doctorId, latestChatCTE.doctorId),
+				eq(latestChatCTE.rn, 1)
 			)
 		)
-		.orderBy(desc(latestChat.createdAt))
+		.orderBy(desc(latestChatCTE.createdAt))
 }
